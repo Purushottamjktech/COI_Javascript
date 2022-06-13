@@ -1,189 +1,160 @@
-class DOMHelper {
-  static clearEventListeners(element) {
-    const clonedElement = element.cloneNode(true);
-    element.replaceWith(clonedElement);
-    return clonedElement;
-  }
+// const numbers = [1, 2, 3];
+// console.log(numbers);
 
-  static moveElement(elementId, newDestinationSelector) {
-    const element = document.getElementById(elementId);
-    const destinationElement = document.querySelector(newDestinationSelector);
-    destinationElement.append(element);
-    element.scrollIntoView({ behavior: 'smooth' });
-  }
-}
+// const moreNumbers = Array(5, 2);
+// console.log(moreNumbers);
 
-class Component {
-  constructor(hostElementId, insertBefore = false) {
-    if (hostElementId) {
-      this.hostElement = document.getElementById(hostElementId);
-    } else {
-      this.hostElement = document.body;
-    }
-    this.insertBefore = insertBefore;
-  }
+// const yetMoreNumbers = Array.of(1, 2);
+// console.log(yetMoreNumbers);
 
-  detach() {
-    if (this.element) {
-      this.element.remove();
-      // this.element.parentElement.removeChild(this.element);
-    }
-  }
+const listItems = document.querySelectorAll('li');
+console.log(listItems);
 
-  attach() {
-    this.hostElement.insertAdjacentElement(
-      this.insertBefore ? 'afterbegin' : 'beforeend',
-      this.element
-    );
+const arrayListItems = Array.from(listItems);
+console.log(arrayListItems);
+
+const hobbies = ['Cooking', 'Sports'];
+const personalData = [30, 'Max', {moreDetail: []}];
+
+const analyticsData = [[1, 1.6], [-5.4, 2.1]];
+
+for (const data of analyticsData) {
+  for (const dataPoint of data) {
+    console.log(dataPoint);
   }
 }
 
-class Tooltip extends Component {
-  constructor(closeNotifierFunction, text, hostElementId) {
-    super(hostElementId);
-    this.closeNotifier = closeNotifierFunction;
-    this.text = text;
-    this.create();
+console.log(personalData[1]);
+
+// const hobbies = ['Sports', 'Cooking'];
+hobbies.push('Reading');
+hobbies.unshift('Coding');
+const poppedValue = hobbies.pop();
+hobbies.shift();
+console.log(hobbies);
+
+hobbies[1] = 'Coding';
+// hobbies[5] = 'Reading'; // rarely used
+console.log(hobbies, hobbies[4]);
+
+hobbies.splice(1, 0, 'Good Food');
+console.log(hobbies);
+
+const removedElements = hobbies.splice(-2, 1);
+console.log(hobbies);
+
+const testResults = [1, 5.3, 1.5, 10.99, 1.5, -5, 10];
+// const storedResults = testResults.slice(2);
+const storedResults = testResults.concat([3.99, 2]);
+
+testResults.push(5.91);
+
+console.log(storedResults, testResults);
+console.log(testResults.indexOf(1.5));
+
+console.log(testResults.includes(10.99));
+console.log(testResults.indexOf(10.99) !== -1);
+
+const personData = [{ name: 'Max' }, { name: 'Manuel' }];
+console.log(personData.indexOf({ name: 'Manuel' }));
+
+const manuel = personData.find((person, idx, persons) => {
+  return person.name === 'Manuel';
+});
+
+manuel.name = 'Anna';
+
+console.log(manuel, personData);
+
+const maxIndex = personData.findIndex((person, idx, persons) => {
+  return person.name === 'Max';
+});
+
+console.log(maxIndex);
+
+// const prices = [10.99, 5.99, 3.99, 6.59];
+// const tax = 0.19;
+// const taxAdjustedPrices = [];
+
+// for (const price of prices) {
+//   taxAdjustedPrices.push(price * (1 + tax));
+// }
+
+prices.forEach((price, idx, prices) => {
+  const priceObj = { index: idx, taxAdjPrice: price * (1 + tax) };
+  taxAdjustedPrices.push(priceObj);
+});
+
+console.log(taxAdjustedPrices);
+
+const prices = [10.99, 5.99, 3.99, 6.59];
+const tax = 0.19;
+
+const taxAdjustedPrices = prices.map((price, idx, prices) => {
+  const priceObj = { index: idx, taxAdjPrice: price * (1 + tax) };
+  return priceObj;
+});
+
+// console.log(prices, taxAdjustedPrices);
+
+const sortedPrices = prices.sort((a, b) => {
+  if (a > b) {
+    return -1;
+  } else if (a === b) {
+    return 0;
+  } else {
+    return 1;
   }
+});
+// console.log(sortedPrices.reverse());
+console.log(sortedPrices);
 
-  closeTooltip = () => {
-    this.detach();
-    this.closeNotifier();
-  };
+const filteredArray = prices.filter(p => p > 6);
 
-  create() {
-    const tooltipElement = document.createElement('div');
-    tooltipElement.className = 'card';
-    const tooltipTemplate = document.getElementById('tooltip');
-    const tooltipBody = document.importNode(tooltipTemplate.content, true);
-    tooltipBody.querySelector('p').textContent = this.text;
-    tooltipElement.append(tooltipBody);
+console.log(filteredArray);
 
-    const hostElPosLeft = this.hostElement.offsetLeft;
-    const hostElPosTop = this.hostElement.offsetTop;
-    const hostElHeight = this.hostElement.clientHeight;
-    const parentElementScrolling = this.hostElement.parentElement.scrollTop;
+// let sum = 0;
 
-    const x = hostElPosLeft + 20;
-    const y = hostElPosTop + hostElHeight - parentElementScrolling - 10;
+// prices.forEach((price) => {
+//   sum += price
+// });
 
-    tooltipElement.style.position = 'absolute';
-    tooltipElement.style.left = x + 'px'; // 500px
-    tooltipElement.style.top = y + 'px';
+// console.log(sum);
 
-    tooltipElement.addEventListener('click', this.closeTooltip);
-    this.element = tooltipElement;
-  }
-}
+const sum = prices.reduce((prevValue, curValue) => prevValue + curValue, 0);
 
-class ProjectItem {
-  hasActiveTooltip = false;
+console.log(sum);
 
-  constructor(id, updateProjectListsFunction, type) {
-    this.id = id;
-    this.updateProjectListsHandler = updateProjectListsFunction;
-    this.connectMoreInfoButton();
-    this.connectSwitchButton(type);
-  }
+const data = 'new york;10.99;2000';
 
-  showMoreInfoHandler() {
-    if (this.hasActiveTooltip) {
-      return;
-    }
-    const projectElement = document.getElementById(this.id);
-    const tooltipText = projectElement.dataset.extraInfo;
-    const tooltip = new Tooltip(
-      () => {
-        this.hasActiveTooltip = false;
-      },
-      tooltipText,
-      this.id
-    );
-    tooltip.attach();
-    this.hasActiveTooltip = true;
-  }
+const transformedData = data.split(';');
+transformedData[1] = +transformedData[1];
+console.log(transformedData);
 
-  connectMoreInfoButton() {
-    const projectItemElement = document.getElementById(this.id);
-    const moreInfoBtn = projectItemElement.querySelector(
-      'button:first-of-type'
-    );
-    moreInfoBtn.addEventListener('click', this.showMoreInfoHandler.bind(this));
-  }
+const nameFragments = ['Max', 'Schwarz'];
+const name = nameFragments.join(' ');
+console.log(name);
 
-  connectSwitchButton(type) {
-    const projectItemElement = document.getElementById(this.id);
-    let switchBtn = projectItemElement.querySelector('button:last-of-type');
-    switchBtn = DOMHelper.clearEventListeners(switchBtn);
-    switchBtn.textContent = type === 'active' ? 'Finish' : 'Activate';
-    switchBtn.addEventListener(
-      'click',
-      this.updateProjectListsHandler.bind(null, this.id)
-    );
-  }
+const copiedNameFragments = [...nameFragments];
+nameFragments.push('Mr');
+console.log(nameFragments, copiedNameFragments);
 
-  update(updateProjectListsFn, type) {
-    this.updateProjectListsHandler = updateProjectListsFn;
-    this.connectSwitchButton(type);
-  }
-}
+console.log(Math.min(...prices));
 
-class ProjectList {
-  projects = [];
+const persons = [{ name: 'Max', age: 30 }, { name: 'Manuel', age: 31 }];
+const copiedPersons = persons.map(person => ({
+  name: person.name,
+  age: person.age
+}));
 
-  constructor(type) {
-    this.type = type;
-    const prjItems = document.querySelectorAll(`#${type}-projects li`);
-    for (const prjItem of prjItems) {
-      this.projects.push(
-        new ProjectItem(prjItem.id, this.switchProject.bind(this), this.type)
-      );
-    }
-    console.log(this.projects);
-  }
+persons.push({ name: 'Anna', age: 29 });
+persons[0].age = 31;
 
-  setSwitchHandlerFunction(switchHandlerFunction) {
-    this.switchHandler = switchHandlerFunction;
-  }
+console.log(persons, copiedPersons);
 
-  addProject(project) {
-    this.projects.push(project);
-    DOMHelper.moveElement(project.id, `#${this.type}-projects ul`);
-    project.update(this.switchProject.bind(this), this.type);
-  }
+const nameData = ['Max', 'Schwarz', 'Mr', 30];
+// const firstName = nameData[0];
+// const lastName = nameData[1];
 
-  switchProject(projectId) {
-    // const projectIndex = this.projects.findIndex(p => p.id === projectId);
-    // this.projects.splice(projectIndex, 1);
-    this.switchHandler(this.projects.find(p => p.id === projectId));
-    this.projects = this.projects.filter(p => p.id !== projectId);
-  }
-}
-
-class App {
-  static init() {
-    const activeProjectsList = new ProjectList('active');
-    const finishedProjectsList = new ProjectList('finished');
-    activeProjectsList.setSwitchHandlerFunction(
-      finishedProjectsList.addProject.bind(finishedProjectsList)
-    );
-    finishedProjectsList.setSwitchHandlerFunction(
-      activeProjectsList.addProject.bind(activeProjectsList)
-    );
-
-    const timerId = setTimeout(this.startAnalytics, 3000);
-
-    document.getElementById('stop-analytics-btn').addEventListener('click', () => {
-      clearTimeout(timerId);
-    });
-  }
-
-  static startAnalytics() {
-    const analyticsScript = document.createElement('script');
-    analyticsScript.src = 'assets/scripts/analytics.js';
-    analyticsScript.defer = true;
-    document.head.append(analyticsScript);
-  }
-}
-
-App.init();
+const [ firstName, lastName, ...otherInformation ] = nameData;
+console.log(firstName, lastName, otherInformation);

@@ -1,113 +1,77 @@
-class AgedPerson {
-  printAge() {
-    console.log(this.age);
-  }
-}
+const button = document.querySelector('button');
+const output = document.querySelector('p');
 
-class Person {
-  name = 'Max';
-
-  constructor() {
-    // super();
-    this.age = 30;
-    // this.greet = function() { ... }
-  }
-
-  // greet = () => {
-  //   console.log(
-  //     'Hi, I am ' + this.name + ' and I am ' + this.age + ' years old.'
-  //   );
-  // };
-
-  greet() {
-    console.log(
-      'Hi, I am ' + this.name + ' and I am ' + this.age + ' years old.'
+const getPosition = opts => {
+  const promise = new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      success => {
+        resolve(success);
+      },
+      error => {
+        reject(error);
+      },
+      opts
     );
-  }
-}
-
-// function Person() {
-//   this.age = 30;
-//   this.name = 'Max';
-//   // this.greet = function() { ... };
-// }
-
-// Person.prototype.greet = function() {
-//   console.log(
-//     'Hi, I am ' + this.name + ' and I am ' + this.age + ' years old.'
-//   );
-// };
-
-// Person.describe = function() {
-//   console.log('Creating persons...');
-// }
-
-// Person.prototype = {
-//   printAge() {
-//     console.log(this.age);
-//   }
-// };
-
-// Person.prototype.printAge = function() {
-//   console.log(this.age);
-// };
-
-// console.dir(Person);
-
-// const p = new Person();
-// p.greet();
-// p.printAge();
-// console.log(p.length);
-// console.log(p.toString());
-// const p2 = new p.__proto__.constructor();
-// console.dir(Object.prototype.__proto__);
-
-// const p = new Person();
-// const p2 = new Person();
-// p.greet();
-// console.log(p);
-
-// const button = document.getElementById('btn');
-// button.addEventListener('click', p.greet.bind(p));
-
-const course = {
-  // new Object()
-  title: 'JavaScript',
-  rating: 5
+  });
+  return promise;
 };
 
-// console.log(Object.getPrototypeOf(course));
-Object.setPrototypeOf(course, {
-  // ...Object.getPrototypeOf(course),
-  printRating: function() {
-    console.log(`${this.rating}/5`);
+const setTimer = duration => {
+  const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve('Done!');
+    }, duration);
+  });
+  return promise;
+};
+
+async function trackUserHandler() {
+  let positionData;
+  let posData;
+  let timerData;
+  try {
+    posData = await getPosition();
+    timerData = await setTimer(2000);
+  } catch (error) {
+    console.log(error);
   }
+  console.log(timerData, posData);
+  // getPosition()
+  //   .then(posData => {
+  //     positionData = posData;
+  //     return setTimer(2000);
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //     return 'on we go...';
+  //   })
+  //   .then(data => {
+  //     console.log(data, positionData);
+  //   });
+  setTimer(1000).then(() => {
+    console.log('Timer done!');
+  });
+  console.log('Getting position...');
+}
+
+button.addEventListener('click', trackUserHandler);
+
+// Promise.race([getPosition(), setTimer(1000)]).then(data => {
+//   console.log(data);
+// });
+
+// Promise.all([getPosition(), setTimer(1000)]).then(promiseData => {
+//   console.log(promiseData);
+// });
+
+Promise.allSettled([getPosition(), setTimer(1000)]).then(promiseData => {
+  console.log(promiseData);
 });
 
-const student = Object.create({
-  printProgress: function() {
-    console.log(this.progress);
-  }
-}, {
-  name: {
-    configurable: true,
-    enumerable: true,
-    value: 'Max',
-    writable: true
-  }
-});
+// let result = 0;
 
-// student.name = 'Max';
+// for (let i = 0; i < 100000; i++) {
+//   result += i;
+// }
 
-Object.defineProperty(student, 'progress', {
-  configurable: true,
-  enumerable: true,
-  value: 0.8,
-  writable: false
-});
-
-student.printProgress();
-
-console.log(student);
-
-course.printRating();
+// console.log(result);

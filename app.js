@@ -1,63 +1,24 @@
 const listElement = document.querySelector('.posts');
 const postTemplate = document.getElementById('single-post');
-const form = document.querySelector('#new-post form');
-const fetchButton = document.querySelector('#available-posts button')
 
-function sendHttpRequest(method, url, data) {
-    const xhr = new Promise((resolve, reject) => {
+const xhr = new XMLHttpRequest();
 
-        const xhr = new XMLHttpRequest();
+xhr.open('GET', 'https://jsonplaceholder.typicode.com/posts');
 
-        xhr.open(method, url);
+xhr.responseType = 'json';
 
-        xhr.responseType = 'json';// alternative of JSON.parse
+xhr.onload = function() {
+  // const listOfPosts = JSON.parse(xhr.response);
+  const listOfPosts = xhr.response;
+  for (const post of listOfPosts) {
+    const postEl = document.importNode(postTemplate.content, true);
+    postEl.querySelector('h2').textContent = post.title.toUpperCase();
+    postEl.querySelector('p').textContent = post.body;
+    listElement.append(postEl);
+  }
+};
 
-        xhr.onload = function () {
-            resolve(xhr.response)
+xhr.send();
 
 
-        };
 
-        xhr.send(JSON.stringify(data));
-    });
-    return Promise
-}
-
-async function fetchPosts() {
-    const responseData = await sendHttpRequest(
-        'GET',
-        'https://jsonplaceholder.typicode.com/posts'
-    );
-
-    const listOfPosts = responseData;
-    for (const post of listOfPosts) {
-        const postEl = document.importNode(postTemplate.content, true);
-        postEl.querySelector('h2').textContent = post.title.toUpperCase();
-        postEl.querySelector('p').textContent = post.body;
-        postEl.querySelector('li').id = post.id;
-        listElement.append(postEl);
-    }
-
-}
-
-async function createPost(title, content) {
-    const userId = Math.random();
-    const post = {
-        title: title,
-        body: content,
-        userId: userId
-    };
-    sendHttpRequest('POST', 'https://jsonplaceholder.typicode.com/posts', post);
-}
-
-fetchButton.addEventListener('click', fetchPosts);
-
-form.addEventListener('submit', event => {
-    event.preventDefault();
-
-    const enteredTitle = event.currentTarget.querySelector('#title').value;
-    const enteredContent = event.currentTarget.querySelector('#content').value;
-
-    createPost(enteredTitle, enteredContent);
-
-});
